@@ -1,64 +1,68 @@
 require 'rails_helper'
 
 RSpec.describe Note, type: :model do
-  it "returns notes that match the search term" do
-    user = User.create(
+  before do
+    @user = User.create(
       first_name: "Joe",
       last_name: "Tester",
       email: "joetester@example.com",
       password: "dottle-nouveau-pavilion-tights-furze",
     )
 
-    project = user.projects.create(
+    @project = @user.projects.create(
       name: "Test Project",
     )
-
-    note1 = project.notes.create(
-      message: 'Cats are cute',
-      user: user
-    )
-
-    note2 = project.notes.create(
-      message: 'Cats are difficult to understand',
-      user: user
-    )
-
-    note3 = project.notes.create(
-      message: 'Dogs are funny',
-      user: user
-    )
-
-    expect(Note.search('cats')).to include(note1, note2)
-    expect(Note.search('cats')).not_to include(note3)
   end
 
-  it "returns an empty collection when no results are found" do
-    user = User.create(
-      first_name: "Joe",
-      last_name: "Tester",
-      email: "joetester@example.com",
-      password: "dottle-nouveau-pavilion-tights-furze",
+  it "is valid with a user, project and message" do
+    note = Note.new(
+      user: @user,
+      project: @project,
+      message: 'Hello, cats'
     )
 
-    project = user.projects.create(
-      name: "Test Project",
-    )
+    expect(note).to be_valid
+  end
 
-    note1 = project.notes.create(
-      message: 'Cats are cute',
-      user: user
-    )
+  it "is invalid without a message" do
+    note = Note.new(message: nil)
+    note.valid?
 
-    note2 = project.notes.create(
-      message: 'Cats are difficult to understand',
-      user: user
-    )
+    expect(note.errors[:message]).to include("can't be blank")
+  end
 
-    note3 = project.notes.create(
-      message: 'Dogs are funny',
-      user: user
-    )
+  describe "search message for a term" do
+    before do
+      # try to use better names, for example, @matching_node
+      # or @note_with_numbers_only, etc.
+      # It depends on what you’re testing, but as a general rule,
+      # try to be expressive with your variable and method names!
+      @note1 = @project.notes.create(
+        message: 'Cats are cute',
+        user: @user
+      )
 
-    expect(Note.search("lizards")).to be_empty
+      @note2 = @project.notes.create(
+        message: 'Cats are difficult to understand',
+        user: @user
+      )
+
+      @note3 = @project.notes.create(
+        message: 'Dogs are funny',
+        user: @user
+      )
+    end
+
+    context "when a match is found" do
+      it "returns notes that match the search term" do
+        expect(Note.search('cats')).to include(@note1, @note2)
+      end
+    end
+
+    context "when no match is found" do
+      it "returns an empty collection when no results are found" do
+        expect(Note.search("I am looking for lizards")).to be_empty
+      end
+    end
   end
 end
