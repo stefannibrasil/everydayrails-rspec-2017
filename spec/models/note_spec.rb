@@ -2,15 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Note, type: :model do
   before do
-    @user = User.create(
+    @user = User.create!(
       first_name: "Joe",
       last_name: "Tester",
-      email: "joetester@example.com",
+      email: "joeuser@example.com",
       password: "dottle-nouveau-pavilion-tights-furze",
     )
 
     @project = @user.projects.create(
-      name: "Test Project",
+      name: "Test Project"
     )
   end
 

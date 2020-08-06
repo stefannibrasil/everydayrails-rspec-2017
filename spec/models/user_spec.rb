@@ -1,15 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  it "is valid with a first name, last name, email, and password" do
-    user = User.new(
+  before do
+    @user = User.new(
       first_name: 'Stefanni',
       last_name: 'Brasil',
-      email: 'test@example.com',
+      email: 'stefanni@hexdevs.com',
       password: '12345678'
     )
+  end
 
-    expect(user).to be_valid
+  it "is valid with a first name, last name, email, and password" do
+    expect(@user).to be_valid
   end
 
   it "is invalid without a first name" do
@@ -34,36 +36,20 @@ RSpec.describe User, type: :model do
   end
 
   it "is invalid with a duplicate email address" do
-    User.create(
-      first_name: "Joe",
-      last_name: "Tester",
-      email:
-      "tester@example.com",
-      password:
-      "dottle-nouveau-pavilion-tights-furze",
-    )
+    @user.save
 
     user = User.new(
       first_name: "Jane",
       last_name: "Tester",
-      email:
-      "tester@example.com",
-      password:
-      "dottle-nouveau-pavilion-tights-furze",
+      email: "stefanni@hexdevs.com",
+      password: "dottle-nouveau-pavilion-tights-furze",
     )
-    user.valid?
 
+    user.valid?
     expect(user.errors[:email]).to include("has already been taken")
   end
 
   it "returns a user's full name as a string" do
-    user = User.new(
-      first_name: 'Stefanni',
-      last_name: 'Brasil',
-      email: 'test@example.com',
-      password: '12345678'
-    )
-
-    expect(user.name).to eq('Stefanni Brasil')
+    expect(@user.name).to eq('Stefanni Brasil')
   end
 end
